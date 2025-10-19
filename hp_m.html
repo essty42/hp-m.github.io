@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>С Днём Рождения, Мария!</title>
+  <style>
+    :root{--accent:#e75480;--bg1:#ffe4e1;--bg2:#fff0f5}
+    *{box-sizing:border-box}
+    body{
+      font-family:Arial, sans-serif;
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      color:#333;
+      text-align:center;
+      margin:0;
+      padding:0;
+    }
+    .container{
+      max-width:600px;
+      margin:40px auto;
+      background:white;
+      border-radius:16px;
+      box-shadow:0 4px 20px rgba(0,0,0,0.1);
+      overflow:hidden;
+      position:relative;
+    }
+    img{
+      width: auto;          /* ширина подстраивается автоматически */
+      max-height: 400px;    /* ограничение по высоте */
+      display: block;
+      margin: 30px auto;    /* отступы сверху и снизу для красоты */
+    }
+    h1{color:var(--accent);margin-top:20px;font-size:32px}
+    p{font-size:18px;padding:0 20px 20px;line-height:1.5}
+    .controls{margin:10px 0 20px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    button{padding:10px 18px;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600;color:white;transition:0.3s}
+    button.primary{background:var(--accent)}
+    button.secondary{background:#999}
+    button:hover{opacity:0.9}
+    footer{background:var(--accent);color:white;padding:10px;font-size:14px;border-bottom-left-radius:16px;border-bottom-right-radius:16px}
+    #confetti{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <canvas id="confetti"></canvas>
+    <img src="photo_2025-10-19_21-40-34.jpg" alt="Фото Марии">
+    <h1>С Днём Рождения, Мария!</h1>
+    <p>Пусть каждый новый год жизни приносил только позитивные изменения и яркие эмоции.<br>
+       Пусть вокруг будут только искренние и добрые люди, а мечты с лёгкостью исполняются.<br>
+       Будь всегда на высоте и не бойся следовать за своими желаниями!</p>
+
+    <div class="controls">
+      <button id="playTune" class="primary">Включить мелодию</button>
+      <button id="confettiBtn" class="secondary">Запустить конфетти</button>
+    </div>
+
+    <footer>С наилучшими пожеланиями — твои друзья.</footer>
+
+    <audio id="birthdayTune" src="melody.mp3" preload="auto"></audio>
+  </div>
+
+  <script>
+    const canvas=document.getElementById('confetti');
+    const ctx=canvas.getContext('2d');
+    let W=canvas.width=window.innerWidth;
+    let H=canvas.height=window.innerHeight;
+    window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight});
+
+    function random(min,max){return Math.random()*(max-min)+min}
+    function Confetto(){
+      this.x=random(0,W);this.y=random(-H,0);this.r=random(6,12);
+      this.color='hsl('+Math.floor(random(0,360))+',70%,60%)';
+      this.tilt=random(-10,10);this.speedY=random(2,6);this.spin=random(-0.1,0.1);
+    }
+    Confetto.prototype.update=function(){this.y+=this.speedY;this.tilt+=this.spin;if(this.y>H+20){this.y=random(-100,-10);this.x=random(0,W)}};
+    Confetto.prototype.draw=function(){ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.tilt*0.02);ctx.fillStyle=this.color;ctx.fillRect(-this.r/2,-this.r/2,this.r,this.r*0.6);ctx.restore()};
+
+    let confettis=[];let animId=null;
+    function spawnConfetti(amount=100){confettis=[];for(let i=0;i<amount;i++)confettis.push(new Confetto());animateConfetti();}
+    function animateConfetti(){if(animId)cancelAnimationFrame(animId);function frame(){ctx.clearRect(0,0,W,H);for(let c of confettis){c.update();c.draw()}animId=requestAnimationFrame(frame)}frame();setTimeout(()=>{if(animId)cancelAnimationFrame(animId);ctx.clearRect(0,0,W,H)},8000)}
+
+    document.getElementById('confettiBtn').addEventListener('click',()=>spawnConfetti(140));
+
+    const birthdayTune = document.getElementById('birthdayTune');
+    document.getElementById('playTune').addEventListener('click', () => {
+      birthdayTune.currentTime = 0;
+      birthdayTune.play().catch(() => {
+        alert('Браузер мог заблокировать автозапуск аудио. Нажми ещё раз.');
+      });
+    });
+  </script>
+</body>
+</html>
